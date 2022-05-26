@@ -9,6 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 func Wins(c *gin.Context) {
@@ -31,10 +32,10 @@ OuterLoop:
 		playerdata = append(playerdata, data.List[i])
 		winsSum = 0
 		t_log := transaction_log{}
-		//playerevent := []structs.WinsEvent{}
-		for k := 0; k < len(playerdata[i].Event); k++ {
-			//playerevent = append(playerevent, playerdata[i].Event[k])
 
+		for k := 0; k < len(playerdata[i].Event); k++ {
+
+			//檢查該玩家該筆資料是否為負，是的話加入錯誤列表
 			if playerdata[i].Event[k].Amount < 0 {
 				winFail = append(winFail, structs.WinsFailList{
 					Account: data.List[i].Account,
@@ -45,6 +46,19 @@ OuterLoop:
 				continue OuterLoop
 			}
 
+			recordBalance, recorCurrency, err := module.CheckWinsMtcodeRecode(playerdata[i].Event[k].Mtcode)
+
+			if err != mongo.ErrNoDocuments {
+
+				winSuccess = append(winSuccess, structs.WinsSuccessList{Account: data.List[i].Account,
+					Balance:  recordBalance,
+					Currency: recorCurrency,
+					Ucode:    data.List[i].Ucode,
+				})
+				continue OuterLoop
+			}
+
+			//加入成功列表
 			winsSum = winsSum + playerdata[i].Event[k].Amount
 			WinsEvent = append(WinsEvent, event{
 				Mtcode:    data.List[i].Event[k].Mtcode,

@@ -14,10 +14,13 @@ import (
 )
 
 func Refunds(c *gin.Context) {
-	var NewBalance float64 = 0
+	var NewBalance, newMongoBalance, beforeMongoBalance float64 = 0, 0, 0
 	data := structs.RefundsReq{}
 	tx := transaction_mgolog{}
 	refundResp := structs.RefundsResp{}
+	//設定mongo撈取規則
+
+	opts2 := options.FindOneAndUpdate().SetUpsert(false)
 
 	if err := c.BindJSON(&data); err != nil {
 		wrapResponse(c, 200, err.Error(), "1003")
@@ -44,9 +47,17 @@ func Refunds(c *gin.Context) {
 	}
 
 	//設定mongo搜尋結果，欄位只要帳號跟符合mtcode的event
-	opts1 := options.FindOne().SetProjection((bson.D{{"event.$", 1}, {"target.account", 1}}))
+	opts1 := options.FindOne().SetProjection((bson.D{{"event.$", 1}, {"target.account", 1}, {"balance", 1}}))
 	//先取出到該mtcode的帳號
 	for _, v := range data.Mtcode {
+		recordBalance, recorCurrency, status := module.CheckRefundsMtcodeRecode(v)
+
+		if status == true {
+			refundResp.Balance = recordBalance
+			refundResp.Currency = recorCurrency
+			wrapResponse(c, 200, refundResp, "0")
+			return
+		}
 
 		err = collection.FindOne(
 			context.TODO(),
@@ -55,12 +66,11 @@ func Refunds(c *gin.Context) {
 		).Decode(&tx)
 
 		//找不到該mtcode就報錯結束這回合
-		if err != nil {
-			if err == mongo.ErrNoDocuments {
-				wrapResponse(c, 200, nil, "1014")
-				return
-			}
+		if err == mongo.ErrNoDocuments {
+			wrapResponse(c, 200, nil, "1014")
+			return
 		}
+
 		//發現該mtcode已經refund就報錯結束
 		if tx.Event[0].Status == "refund" {
 			wrapResponse(c, 200, nil, "1015")
@@ -68,6 +78,27 @@ func Refunds(c *gin.Context) {
 		}
 		//加上這張單金額
 		NewBalance += tx.Event[0].Amount
+		beforeMongoBalance = tx.Balance
+		newMongoBalance = tx.Event[0].Amount + beforeMongoBalance
+
+		findMtcode := structs.UpdateByMtcode{Mtcode: v}
+		filter := findMtcode
+
+		update := bson.D{{"$set", bson.D{{"balance", newMongoBalance}}}}
+		fmt.Println(newMongoBalance)
+
+		err = collection.FindOneAndUpdate(
+			context.TODO(),
+			filter,
+			update,
+			opts2,
+		).Decode(&tx)
+
+		if err != nil {
+			wrapResponse(c, 200, nil, "1014")
+			return
+		}
+
 	}
 
 	//開啟Mysql
@@ -92,8 +123,6 @@ func Refunds(c *gin.Context) {
 	//交易提交
 	MysqlTx.Commit()
 
-	opts2 := options.FindOneAndUpdate().SetUpsert(false)
-
 	for _, v := range data.Mtcode {
 
 		findMtcode := structs.UpdateByMtcode{Mtcode: v}
@@ -117,5 +146,5 @@ func Refunds(c *gin.Context) {
 	refundResp.Balance = NewBalance
 	refundResp.Currency = GormUser.Currency
 	wrapResponse(c, 200, refundResp, "0")
-
+	return
 }
