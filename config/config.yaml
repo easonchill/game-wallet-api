@@ -1,0 +1,23 @@
+# application:
+#   timeout:
+#     read: 1000
+#     write: 1000
+#   port: 8087
+#   uploadPath: "./upload"
+#   mode: "debug"
+#   appId: "go"
+#   apiBaseRoute: "/api"
+
+mysql:
+  host: "127.0.0.1"
+  port: 3306
+  user: "root"
+  password: "aaaa1234"
+  dbname: "basil"
+  max_open_conns: 200
+  max_idle_conns: 50
+
+gin:
+  wtoken: "9527"
+  port : "87"
+  mode : "debug"
