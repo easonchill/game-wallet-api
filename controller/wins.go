@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"log"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -25,13 +26,14 @@ func Wins(c *gin.Context) {
 	var winFail []structs.WinsFailList
 	var playerdata []structs.WinsReqList
 	var winsSum float64
-	var WinsEvent []event
+	var WinsEvent []structs.Event
 
 OuterLoop:
 	for i := 0; i < len(data.List); i++ {
 		playerdata = append(playerdata, data.List[i])
 		winsSum = 0
-		t_log := transaction_log{}
+		WinsEvent = nil
+		t_log := structs.TransactionMgoLog{}
 
 		for k := 0; k < len(playerdata[i].Event); k++ {
 
@@ -60,7 +62,7 @@ OuterLoop:
 
 			//加入成功列表
 			winsSum = winsSum + playerdata[i].Event[k].Amount
-			WinsEvent = append(WinsEvent, event{
+			WinsEvent = append(WinsEvent, structs.Event{
 				Mtcode:    data.List[i].Event[k].Mtcode,
 				Amount:    data.List[i].Event[k].Amount,
 				Even_time: data.List[i].Event[k].Eventime,
@@ -102,20 +104,13 @@ OuterLoop:
 		//交易提交
 		tx.Commit()
 
-		t_log = transaction_log{
+		t_log = structs.TransactionMgoLog{
 			Action: "wins",
-			Target: struct {
-				Account string "json:\"account\" bson:\"account\""
-			}{
+			Target: structs.Target{
 				Account: data.List[i].Account,
 			},
 
-			Status: struct {
-				Create_time string "json:\"createtime\" bson:\"createtime\""
-				End_time    string "json:\"endtime\"  bson:\"endtime\""
-				Status      string "json:\"status\" bson:\"status\""
-				Msg         string "json:\"message\" bson:\"message\""
-			}{
+			Status: structs.Status{
 				Create_time: nowTime(),
 				End_time:    data.List[i].Eventtime,
 				Status:      "success",
@@ -160,5 +155,7 @@ OuterLoop:
 		Success: winSuccess,
 		Failed:  winFail,
 	}
+
+	time.Sleep(60 * time.Second)
 	wrapResponse(c, 200, o, "0")
 }

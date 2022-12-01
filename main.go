@@ -16,6 +16,7 @@ func main() {
 
 	//gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
 	r := gin.Default()
+
 	routers.SetRouter(r)
 
 	r.Run(controller.Port)

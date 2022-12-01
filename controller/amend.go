@@ -13,10 +13,10 @@ import (
 )
 
 func Amend(c *gin.Context) {
-	var amendTotal float64
+	var amendTotal float64 = 0
 	var amendEvent []structs.AmendEvent
 	var amendResp structs.AmendResp
-	var tx transaction_mgolog
+	var tx structs.TransactionMgoLog
 
 	CheckMtcode := make(map[string]int)
 	// startTime := time.Now()
@@ -79,7 +79,7 @@ func Amend(c *gin.Context) {
 		if data.Data[i].Action == "credit" {
 			amendTotal += data.Data[i].Amount
 		} else if data.Data[i].Action == "debit" {
-			amendTotal -= data.Data[i].Amount
+			amendTotal += -data.Data[i].Amount
 		} else {
 			wrapResponse(c, 200, nil, "1003")
 			return

@@ -10,7 +10,7 @@ import (
 )
 
 func CheckMtcodeRecode(mtc string) (amount float64, currency string, CheckMtcodeRecodeErr error) {
-	var tx structs.Transaction_mgolog
+	var tx structs.TransactionMgoLog
 	mongoClient, err := GetMgoCli()
 	defer func() {
 		if err = mongoClient.Disconnect(context.TODO()); err != nil {

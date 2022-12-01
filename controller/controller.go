@@ -16,7 +16,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/spf13/viper"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 //Config
@@ -36,12 +35,12 @@ func init() {
 	if err != nil {
 		panic("讀取設定檔出現錯誤，原因為：" + err.Error())
 	}
+
 	wtoken = viper.GetString("gin.wtoken")
 	Port = ":" + viper.GetString("gin.port")
 	Mode = viper.GetString("gin.mode")
 }
 
-// 會用到的結構
 type LoginInfo struct {
 	UserID     int64     `json:"userId"`
 	ClientIP   string    `json:"clientIP"`
@@ -59,48 +58,6 @@ type User struct {
 	Create_time string  `json:"create_time"`
 }
 
-type transaction_log struct {
-	Action string `json:"action" bson:"action"`
-	Target struct {
-		Account string `json:"account" bson:"account"`
-	} `json:"target"`
-	Status struct {
-		Create_time string `json:"createtime" bson:"createtime"`
-		End_time    string `json:"endtime"  bson:"endtime"`
-		Status      string `json:"status" bson:"status"`
-		Msg         string `json:"message" bson:"message"`
-	} `json:"status"`
-	Before   float64 `json:"before"`
-	Balance  float64 `json:"balance"`
-	Currency string  `json:"currency"`
-	Event    []event `json:"event"`
-}
-
-type transaction_mgolog struct {
-	Id     primitive.ObjectID `json:"id"  bson:"_id"`
-	Action string             `json:"action" bson:"action"`
-	Target struct {
-		Account string `json:"account" bson:"account"`
-	} `json:"target"`
-	Status struct {
-		Create_time string `json:"createtime" bson:"createtime"`
-		End_time    string `json:"endtime"  bson:"endtime"`
-		Status      string `json:"status" bson:"status"`
-		Msg         string `json:"message" bson:"message"`
-	} `json:"status"`
-	Before   float64 `json:"before"`
-	Balance  float64 `json:"balance"`
-	Currency string  `json:"currency"`
-	Event    []event `json:"event"`
-}
-
-type event struct {
-	Mtcode    string  `json:"mtcode" bson:"mtcode"`
-	Amount    float64 `json:"amount" bson:"amount"`
-	Even_time string  `json:"eventime" bson:"eventime"`
-	Status    string  `json:"status" bson:"status"`
-}
-
 func NewLoginInfo(id int64, clientIP string, loginState string) *LoginInfo {
 	return &LoginInfo{
 		UserID:     id,
@@ -113,6 +70,10 @@ func NewLoginInfo(id int64, clientIP string, loginState string) *LoginInfo {
 func CheckPlayer(c *gin.Context) {
 
 	account := c.Param("input")
+
+	// if account == "20220523sporttest" {
+	// 	time.Sleep(3 * time.Second)
+	// }
 
 	testdb, _ := module.GetMysql()
 
@@ -149,6 +110,8 @@ func Balance(c *gin.Context) {
 
 	testdb.Where("account = ?", account).Find(&GormUser)
 	testdb.Close()
+
+	// time.Sleep(10 * time.Second)
 
 	wrapResponse(c, 200, gin.H{
 		"balance":  GormUser.Balance,
@@ -189,6 +152,10 @@ func CreateUser(c *gin.Context) {
 		wrapResponse(c, 200, gin.H{"Account Create Success": data.Account}, "0")
 		return
 	}
+}
+
+func Version(c *gin.Context) {
+	wrapResponse(c, 200, gin.H{"Basil Version": "2.0.0_test60658"}, "0")
 }
 
 // 中間件

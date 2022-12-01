@@ -12,7 +12,8 @@ import (
 )
 
 func Record(c *gin.Context) {
-	var tx transaction_mgolog
+	var tx structs.TransactionMgoLog
+
 	//var result bson.M
 	mtcode := c.Param("mtcode")
 
@@ -52,7 +53,7 @@ func Record(c *gin.Context) {
 
 	for _, v := range tx.Event {
 		if v.Mtcode == mtcode {
-			newSlice := []event{v}
+			newSlice := []structs.Event{v}
 			tx.Event = newSlice
 		}
 	}

@@ -16,7 +16,7 @@ import (
 func Refunds(c *gin.Context) {
 	var NewBalance, newMongoBalance, beforeMongoBalance float64 = 0, 0, 0
 	data := structs.RefundsReq{}
-	tx := transaction_mgolog{}
+	tx := structs.TransactionMgoLog{}
 	refundResp := structs.RefundsResp{}
 	//設定mongo撈取規則
 
@@ -141,6 +141,7 @@ func Refunds(c *gin.Context) {
 			return
 		}
 
+		module.SaveMtcodeRecord(v, "refund", NewBalance)
 	}
 
 	refundResp.Balance = NewBalance

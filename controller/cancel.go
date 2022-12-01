@@ -17,7 +17,7 @@ func Cancel(c *gin.Context) {
 	var NewBalance float64 = 0
 	data := structs.CancelReq{}
 
-	tx := transaction_mgolog{}
+	tx := structs.TransactionMgoLog{}
 
 	cancelResp := structs.CancelResp{}
 

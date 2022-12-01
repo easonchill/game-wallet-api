@@ -14,8 +14,8 @@ import (
 
 func Bets(c *gin.Context) {
 	var betsTotal float64
-	var betsEvent []event
-	var tx transaction_mgolog
+	var betsEvent []structs.Event
+	var transactionMgoLog structs.TransactionMgoLog
 
 	data := structs.BetsReq{} //注意該結構接受的内容
 	c.BindJSON(&data)
@@ -47,7 +47,7 @@ func Bets(c *gin.Context) {
 			context.TODO(),
 			findMtcode,
 			opts,
-		).Decode(&tx)
+		).Decode(&transactionMgoLog)
 
 		if err != mongo.ErrNoDocuments {
 			wrapResponse(c, 200, nil, "2009")
@@ -64,7 +64,7 @@ func Bets(c *gin.Context) {
 			}
 		}
 
-		betsEvent = append(betsEvent, event{
+		betsEvent = append(betsEvent, structs.Event{
 			Mtcode:    data.Data[i].Mtcode,
 			Amount:    data.Data[i].Amount,
 			Even_time: data.Data[i].Eventime,
@@ -98,20 +98,12 @@ func Bets(c *gin.Context) {
 		ent := nowTime()
 
 		//準備寫入MongoDB的交易紀錄ㄖ
-		t_log := transaction_log{
+		transactionMgoLog = structs.TransactionMgoLog{
 			Action: "bets",
-			Target: struct {
-				Account string "json:\"account\" bson:\"account\""
-			}{
+			Target: structs.Target{
 				Account: data.Account,
 			},
-
-			Status: struct {
-				Create_time string "json:\"createtime\" bson:\"createtime\""
-				End_time    string "json:\"endtime\"  bson:\"endtime\""
-				Status      string "json:\"status\" bson:\"status\""
-				Msg         string "json:\"message\" bson:\"message\""
-			}{
+			Status: structs.Status{
 				Create_time: crt,
 				End_time:    ent,
 				Status:      "success",
@@ -124,7 +116,7 @@ func Bets(c *gin.Context) {
 		}
 
 		//把交易紀錄塞進mongoDB
-		_, err := collection.InsertOne(context.TODO(), t_log)
+		_, err := collection.InsertOne(context.TODO(), transactionMgoLog)
 		if err != nil {
 			panic(err)
 		}

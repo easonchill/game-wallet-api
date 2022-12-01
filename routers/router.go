@@ -2,17 +2,20 @@ package routers
 
 import (
 	"Basil/controller"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
 func SetRouter(r *gin.Engine) {
-	r.Use(controller.CheckTokenMiddleware(), controller.SetContentTypeJson())
-
+	//r.Use(controller.CheckTokenMiddleware(), controller.SetContentTypeJson())
+	r.LoadHTMLGlob("views/*")
 	r.GET("/player/check/:input", controller.CheckPlayer)
-
+	r.GET("/version", controller.Version)
+	r.GET("/", index)
 	t := r.Group("/transaction")
 	{
+
 		t.GET("/balance/:input", controller.Balance)
 		t.GET("/record/:mtcode", controller.Record)
 		t.POST("/game/bets", controller.Bets)
@@ -24,12 +27,6 @@ func SetRouter(r *gin.Engine) {
 		t.POST("/user/payoff", controller.Payoff)
 	}
 
-	// u := r.Group("/user")
-	// {
-	// 	u.POST("/createUser", controller.CreateUser)
-	// 	//u.GET("/fetchUser", fetchUser)
-	// }
-
 	u := r.Group("/swclient/test")
 	{
 		//新增帳號
@@ -37,16 +34,10 @@ func SetRouter(r *gin.Engine) {
 		//u.GET("/fetchUser", fetchUser)
 	}
 
-	// }
+}
 
-	// // func hello(c *gin.Context) {
-	// // 	c.JSON(200, gin.H{
-	// // 		"message": "Hello world!!",
-	// // 	})
-	// // }
+func index(c *gin.Context) {
 
-	// func fetchUser(c *gin.Context) {
-	// 	c.JSON(200, gin.H{
-	// 		"message": "Hello world!!",
-	// 	})
+	c.HTML(http.StatusOK, "index.html", nil)
+
 }

@@ -29,6 +29,7 @@ func Amends(c *gin.Context) {
 
 OuterLoop:
 	for i := 0; i < len(data.List); i++ {
+		amendsEvent = nil
 		playerdata = append(playerdata, data.List[i])
 		amendsSum = 0
 		amendsTranRecord := structs.AmendRecord{}

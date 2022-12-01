@@ -10,7 +10,7 @@ import (
 )
 
 func CheckWinsMtcodeRecode(mtc string) (amount float64, currency string, CheckMtcodeRecodeErr error) {
-	var tx structs.Transaction_mgolog
+	var tx structs.TransactionMgoLog
 	mongoClient, err := GetMgoCli()
 	defer func() {
 		if err = mongoClient.Disconnect(context.TODO()); err != nil {
@@ -36,7 +36,6 @@ func CheckWinsMtcodeRecode(mtc string) (amount float64, currency string, CheckMt
 	if err == mongo.ErrNoDocuments {
 		log.Println("wins：該mtcode是新的一筆")
 		return 0, "", err
-
 	}
 	log.Println("wins：該mtcode已存在，讀取mongodb裡的紀錄")
 	log.Println(tx.Balance)

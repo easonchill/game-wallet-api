@@ -7,13 +7,16 @@ import (
 	"log"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func CheckRefundsMtcodeRecode(mtc string) (amount float64, currency string, CheckMtcodeRecodStatus bool) {
-	var tx structs.Transaction_mgolog
+	var tx structs.TransactionMgoLog
+	var mtcodeRecord structs.MtcodeBalanceMgoLog
+
 	mongoClient, err := GetMgoCli()
 	defer func() {
 		if err = mongoClient.Disconnect(context.TODO()); err != nil {
@@ -49,6 +52,50 @@ func CheckRefundsMtcodeRecode(mtc string) (amount float64, currency string, Chec
 	}
 	log.Println("Refunds：該mtcode已被refund，讀取mongodb裡的紀錄")
 	log.Println(tx.Balance)
-	return tx.Balance, tx.Currency, true
 
+	collection = mongoClient.Database("transaction").Collection("mtcodeRecord")
+
+	opts := options.FindOne().SetSkip(0)
+
+	findMtcode := structs.FindByMtcodeRecord{Mtcode: mtc}
+
+	err = collection.FindOne(
+		context.TODO(),
+		findMtcode,
+		opts,
+	).Decode(&mtcodeRecord)
+
+	return mtcodeRecord.Balance, tx.Currency, true
+
+}
+
+func SaveMtcodeRecord(mtcode string, action string, balance float64) (e error) {
+
+	t := structs.MtcodeBalanceMgoLog{
+		Id:      primitive.NewObjectID(),
+		Mtcode:  mtcode,
+		Action:  action,
+		Balance: balance,
+	}
+
+	mongoClient, err := GetMgoCli()
+
+	defer func() {
+		if err = mongoClient.Disconnect(context.TODO()); err != nil {
+			log.Fatal(err)
+		}
+	}()
+
+	if err != nil {
+		panic(err)
+	}
+
+	collection := mongoClient.Database("transaction").Collection("mtcodeRecord")
+	_, err = collection.InsertOne(context.TODO(), t)
+
+	if err != nil {
+		panic(err)
+	}
+
+	return err
 }

@@ -1,13 +1,15 @@
 package structs
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
-
 type FindByMtcode struct {
 	Mtcode string `bson:"event.mtcode"`
 }
 
 type FindByMtcodeOnlyOne struct {
 	Mtcode string `bson:"event.mtcode"`
+}
+
+type FindByMtcodeRecord struct {
+	Mtcode string `bson:"mtcode"`
 }
 
 type UpdateByMtcode struct {
@@ -56,25 +58,7 @@ type AmendStatus struct {
 	Message    string `json:"message"`
 }
 
-type Transaction_mgolog struct {
-	Id     primitive.ObjectID `json:"id"  bson:"_id"`
-	Action string             `json:"action" bson:"action"`
-	Target struct {
-		Account string `json:"account" bson:"account"`
-	} `json:"target"`
-	Status struct {
-		Create_time string `json:"createtime" bson:"createtime"`
-		End_time    string `json:"endtime"  bson:"endtime"`
-		Status      string `json:"status" bson:"status"`
-		Msg         string `json:"message" bson:"message"`
-	} `json:"status"`
-	Before   float64 `json:"before"`
-	Balance  float64 `json:"balance"`
-	Currency string  `json:"currency"`
-	Event    []event `json:"event"`
-}
-
-type event struct {
+type Event struct {
 	Mtcode    string  `json:"mtcode" bson:"mtcode"`
 	Amount    float64 `json:"amount" bson:"amount"`
 	Even_time string  `json:"eventime" bson:"eventime"`

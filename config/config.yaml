@@ -19,5 +19,5 @@ mysql:
 
 gin:
   wtoken: "9527"
-  port : "87"
+  port : "88"
   mode : "debug"
