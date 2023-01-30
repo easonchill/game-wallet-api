@@ -58,7 +58,7 @@ func GetMysql() (*gorm.DB, error) {
 func GetMgoCli() (*mongo.Client, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27017"))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:55000"))
 	return client, err
 }
 
@@ -73,11 +73,11 @@ func AddMoney(account string, money float64) (newBalance float64, err error) {
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return GormUser.Balance, gorm.ErrRecordNotFound
 	}
-
+	//開啟交易
+	tx := dbs.Begin()
 	beforeBalance := GormUser.Balance
 	newBalance = money + beforeBalance
 
-	tx := dbs.Begin()
 	if err := tx.Model(&GormUser).Where("account = ?", account).Update("balance", newBalance).Error; err != nil {
 		tx.Rollback()
 		panic(err)

@@ -1,9 +1,9 @@
 package controller
 
 import (
-	"Basil/module"
-	"Basil/structs"
 	"fmt"
+	"game-wallet-api/module"
+	"game-wallet-api/structs"
 
 	"github.com/gin-gonic/gin"
 )

@@ -12,8 +12,8 @@ mysql:
   host: "127.0.0.1"
   port: 3306
   user: "root"
-  password: "aaaa1234"
-  dbname: "basil"
+  password: "1234"
+  dbname: "game-wallet-api"
   max_open_conns: 200
   max_idle_conns: 50
 

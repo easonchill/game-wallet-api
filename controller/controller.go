@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"Basil/module"
-	"Basil/structs"
+	"game-wallet-api/module"
+	"game-wallet-api/structs"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -155,7 +155,7 @@ func CreateUser(c *gin.Context) {
 }
 
 func Version(c *gin.Context) {
-	wrapResponse(c, 200, gin.H{"Basil Version": "2.0.0_test60658"}, "0")
+	wrapResponse(c, 200, gin.H{"game-wallet-api Version": "2.0.0_test60658"}, "0")
 }
 
 // 中間件

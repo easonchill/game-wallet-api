@@ -1,8 +1,8 @@
 package module
 
 import (
-	"Basil/structs"
 	"context"
+	"game-wallet-api/structs"
 	"log"
 
 	"go.mongodb.org/mongo-driver/mongo"

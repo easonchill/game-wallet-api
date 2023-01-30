@@ -1,10 +1,10 @@
 package controller
 
 import (
-	"Basil/module"
-	"Basil/structs"
 	"context"
 	"errors"
+	"game-wallet-api/module"
+	"game-wallet-api/structs"
 	"log"
 	"time"
 
