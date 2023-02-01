@@ -24,7 +24,7 @@
 ### MySQL
 | Key | Describe |
 | -------- | -------- |
-|host|MySQL的主機位置|
+|host|MySQL的主機位置|
 |port|MySQL的PORT號|
 |account|MySQL的使用者帳號|
 |password|MySQL的登入密碼|
@@ -45,7 +45,7 @@
 | -------- | -------- | -------- |
 |POST|/swclient/test/setaccount|建立新玩家
 | GET     | /player/check/:account     |  檢查玩家帳號是否存在|
-|GET|/transaction/balance/:account|取得玩家錢包餘額
+|GET|/transaction/balance/:account|取得玩家錢包餘額
 |GET|/transaction/record/:mtcode|查詢交易紀錄
 |POST| /transaction/game/bets|批次下注
 |POST| /transaction/game/wins|批次派彩
