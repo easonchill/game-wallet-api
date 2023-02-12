@@ -1,3 +1,6 @@
+
+[TOC]
+
 # 介紹
 這是我為了練習golang而建立的side project，模擬一個遊戲支付錢包服務。
 
@@ -24,7 +27,7 @@
 ### MySQL
 | Key | Describe |
 | -------- | -------- |
-|host|MySQL的主機位置|
+|host|MySQL的主機位置|
 |port|MySQL的PORT號|
 |account|MySQL的使用者帳號|
 |password|MySQL的登入密碼|
@@ -54,6 +57,28 @@
 |POST|/transaction/game/amend|單人修改派彩結果
 |POST|/transaction/game/amends|批次多人修改派彩結果
 
+## CreatePlayer
+### 建立新玩家
+
+**Request**
+
+URL: `/swclient/test/setaccount`
+
+Method: `GET`
+
+Headers :<br/>
+
+`wtoken:config裡設定的token`<br/>
+
+
+**Path Variables** 
+
+| 參數     |  型別  | 必填 | 敘述 |
+| - | :-: | :-: | :-|
+| account     	  | string| 必填 |玩家帳號|
+| password     	  | string| 必填 |玩家密碼|
+|balance| number| 必填 | 玩家初始餘額|
+| currency     	  | string| 必填 |幣別|
 
 ## CheckPlayer
 ### 檢查玩家帳號是否存在
@@ -97,7 +122,7 @@ curl --location --request GET '{Wurl}/player/check/Testplayer' \
   "status": {
     "code": "0",
     "message": "Success",
-    "datetime": "2017-01-20T01:14:48-04:00"
+    "datetime": "2023-01-20T01:14:48-04:00"
   }
 }
 ```
@@ -108,7 +133,7 @@ curl --location --request GET '{Wurl}/player/check/Testplayer' \
   "status": {
     "code": "0",
     "message": "Success",
-    "datetime": "2017-01-20T01:14:48-04:00"
+    "datetime": "2023-01-20T01:14:48-04:00"
   }
 }
 ```
