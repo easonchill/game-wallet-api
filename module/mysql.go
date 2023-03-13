@@ -1,18 +1,11 @@
 package module
 
 import (
-	"context"
 	"errors"
-	"fmt"
-	"time"
+	"game-wallet-api/env"
 
 	"github.com/jinzhu/gorm"
-	"github.com/spf13/viper"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
-
-var mysqlConfig string
 
 type User struct {
 	Account     string  `json:"account"`
@@ -24,42 +17,12 @@ type User struct {
 	Create_time string  `json:"create_time"`
 }
 
-func init() {
-	//載入config的DB設定
-
-	viper.SetConfigName("config")
-	viper.SetConfigType("yaml")
-	viper.AddConfigPath("./config")
-
-	err := viper.ReadInConfig()
-
-	if err != nil {
-		panic("讀取設定檔出現錯誤，原因為：" + err.Error())
-	}
-
-	mysqlConfig = fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-		viper.GetString("mysql.user"),
-		viper.GetString("mysql.password"),
-		viper.GetString("mysql.host"),
-		viper.GetInt("mysql.port"),
-		viper.GetString("mysql.dbname"),
-	)
-	fmt.Println("config load success!")
-}
-
 func GetMysql() (*gorm.DB, error) {
-	db, err := gorm.Open("mysql", mysqlConfig)
+	db, err := gorm.Open("mysql", env.MysqlConfig)
 	//defer db.Close()
 	db.DB().SetMaxIdleConns(10)
 	db.DB().SetMaxOpenConns(100)
 	return db, err
-}
-
-func GetMgoCli() (*mongo.Client, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:55000"))
-	return client, err
 }
 
 func AddMoney(account string, money float64) (newBalance float64, err error) {

@@ -10,36 +10,13 @@ import (
 	"strings"
 	"time"
 
+	"game-wallet-api/env"
 	"game-wallet-api/module"
 	"game-wallet-api/structs"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
-	"github.com/spf13/viper"
 )
-
-//Config
-var wtoken, Port, Mode string
-
-func init() {
-
-	viper.SetConfigName("config")
-	viper.SetConfigType("yaml")
-	viper.AddConfigPath("./config")
-	viper.SetDefault("gin.port", 8080)
-	viper.SetDefault("gin.wtoken", "1234")
-	viper.SetDefault("gin.mode", gin.DebugMode)
-
-	err := viper.ReadInConfig()
-
-	if err != nil {
-		panic("讀取設定檔出現錯誤，原因為：" + err.Error())
-	}
-
-	wtoken = viper.GetString("gin.wtoken")
-	Port = ":" + viper.GetString("gin.port")
-	Mode = viper.GetString("gin.mode")
-}
 
 type LoginInfo struct {
 	UserID     int64     `json:"userId"`
@@ -169,7 +146,7 @@ func CheckTokenMiddleware() gin.HandlerFunc {
 			//回傳錯誤值
 			wrapResponse(c, 403, map[string]string{"msg": "未帶入token"}, "1003")
 		} else {
-			if token == wtoken {
+			if token == env.Wtoken {
 				c.Next()
 			} else {
 				c.Abort()
@@ -257,7 +234,7 @@ func (l LogTest) Write(p []byte) (n int, err error) {
 	l.s = p
 	d := string(l.s)
 	d = strings.Replace(d, "\n", "", -1)
-	url := "https://api.telegram.org/bot5397186861:AAF_6jiONQg4KYvICRy0OOU9MGRI1OnOTnA/sendMessage?&parse_mode=html&chat_id=527687006&text=" + d
+	url := env.TGurl + d
 	method := "POST"
 
 	client := &http.Client{}

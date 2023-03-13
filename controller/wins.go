@@ -6,7 +6,6 @@ import (
 	"game-wallet-api/module"
 	"game-wallet-api/structs"
 	"log"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -156,6 +155,5 @@ OuterLoop:
 		Failed:  winFail,
 	}
 
-	time.Sleep(60 * time.Second)
 	wrapResponse(c, 200, o, "0")
 }

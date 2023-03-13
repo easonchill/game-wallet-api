@@ -74,20 +74,21 @@ func Bets(c *gin.Context) {
 
 	//透過GORM連接MySQL，先取得MySQL裡玩家目前餘額
 	testdb, _ := module.GetMysql()
+	defer testdb.Close()
 	account := data.Account
 	var GormUser = new(User)
 
 	testdb.Where("account = ?", account).Find(&GormUser)
-	defer testdb.Close()
 
+	//開啟GORM交易處理(事務)，將新的餘額寫回MySQL
+	tx := testdb.Begin()
 	beforeBalance := GormUser.Balance
 	if GormUser.Balance < betsTotal {
 		wrapResponse(c, 200, nil, "1005")
 	} else {
 		//扣掉本次下注，取到新的餘額
 		NewBalance := beforeBalance - betsTotal
-		//開啟GORM交易處理(事務)，將新的餘額寫回MySQL
-		tx := testdb.Begin()
+
 		if err := tx.Model(&GormUser).Where("account = ?", account).Update("balance", NewBalance).Error; err != nil {
 			tx.Rollback()
 			fmt.Println(err)

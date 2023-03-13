@@ -2,6 +2,7 @@ package main
 
 import (
 	"game-wallet-api/controller"
+	"game-wallet-api/env"
 	"game-wallet-api/routers"
 	"io"
 	"os"
@@ -13,11 +14,9 @@ import (
 func main() {
 
 	//設定為true，會將log同步輸出到設定好的tg頻道
-	outputLogToTG := true
+	gin.SetMode(env.Mode)
 
-	gin.SetMode(controller.Mode)
-
-	if outputLogToTG {
+	if env.OutputLogToTG {
 		f := controller.LogTest{}
 		gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
 	}
@@ -27,6 +26,6 @@ func main() {
 
 	routers.SetRouter(r)
 
-	r.Run(controller.Port)
+	r.Run(env.Port)
 
 }

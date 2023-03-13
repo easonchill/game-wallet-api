@@ -17,7 +17,19 @@ mysql:
   max_open_conns: 200
   max_idle_conns: 50
 
+mongodb:
+  host: "127.0.0.1"
+  port: 55001
+  user: "docker"
+  password: "mongopw"
+
 gin:
   wtoken: "9527"
   port : "88"
   mode : "debug"
+
+#若outputLogToTG為true，必須填入TGurl
+other:
+  outputLogToTG : "false"
+  TGurl : ""
+
